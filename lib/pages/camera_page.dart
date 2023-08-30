@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-
 import 'history.dart';
 import 'home_page.dart';
 
@@ -50,6 +49,9 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+        title: const Text("FaceTally"),
+        ),
       backgroundColor: Colors.red[100],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -60,13 +62,15 @@ class _CameraPageState extends State<CameraPage> {
         child: const Icon(Icons.cameraswitch),
       ),
       body: SafeArea(
-        child: Stack(children: [
-          (_cameraController.value.isInitialized)
-              ? CameraPreview(_cameraController)
-              : Container(
-                  color: Colors.red[100],
-                  child: const Center(child: CircularProgressIndicator())),
-        ]),
+        child: SingleChildScrollView(
+          child: Stack(children: [
+            (_cameraController.value.isInitialized)
+                ? CameraPreview(_cameraController)
+                : Container(
+                    color: Colors.pink[100],
+                    child: const Center(child: CircularProgressIndicator())),
+          ]),
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         destinations: const [

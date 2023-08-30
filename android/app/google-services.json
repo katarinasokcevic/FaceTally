@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "98217838757",
+    "project_id": "facetally-a36cc",
+    "storage_bucket": "facetally-a36cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:98217838757:android:9da8cec112ef3814c9a54c",
+        "android_client_info": {
+          "package_name": "com.example.facetally"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "98217838757-66387lm4u1bca23de7n80sh1qjngmnlq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjdc2StnnzHKr02h4x8E4kw4-_-wmrdEM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "98217838757-66387lm4u1bca23de7n80sh1qjngmnlq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
