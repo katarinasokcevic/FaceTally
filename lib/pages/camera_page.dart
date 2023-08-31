@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'history.dart';
 import 'home_page.dart';
@@ -46,11 +47,21 @@ class _CameraPageState extends State<CameraPage> {
     HistoryPage()
   ];
 
+  void signUserOut() {
+    FirebaseAuth.instance.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
         title: const Text("FaceTally"),
+          actions: [
+            IconButton(
+              onPressed: signUserOut,
+              icon: const Icon(Icons.logout),
+            )
+          ],
         ),
       backgroundColor: Colors.red[100],
       floatingActionButton: FloatingActionButton(

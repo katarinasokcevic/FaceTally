@@ -1,4 +1,4 @@
-import 'package:facetally/pages/auth_page.dart';
+import 'package:facetally/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       title: 'FaceTally',
       debugShowCheckedModeBanner: false,
-      home: AuthPage(),
+      home: SplashScreen(),
     );
   }
 }
