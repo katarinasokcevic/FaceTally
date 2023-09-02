@@ -10,8 +10,12 @@ class CameraPage extends StatefulWidget {
   final CustomPaint? customPaint;
   final Function(InputImage inputImage) onImage;
 
-  const CameraPage({Key? key, required this.cameras, required this.onImage,
-    this.customPaint,}) : super(key: key);
+  const CameraPage({
+    Key? key,
+    required this.cameras,
+    required this.onImage,
+    this.customPaint,
+  }) : super(key: key);
 
   final List<CameraDescription>? cameras;
 
@@ -36,8 +40,9 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   Future initCamera(CameraDescription cameraDescription) async {
-    _cameraController =
-        CameraController(cameraDescription, ResolutionPreset.high, enableAudio: false);
+    _cameraController = CameraController(
+        cameraDescription, ResolutionPreset.high,
+        enableAudio: false);
     try {
       await _cameraController.initialize().then((_) {
         if (!mounted) return;
@@ -48,11 +53,9 @@ class _CameraPageState extends State<CameraPage> {
       debugPrint("camera error $e");
     }
   }
-  int currentPage=0;
-  List<Widget> pages = const [
-    HomePage(),
-    HistoryPage()
-  ];
+
+  int currentPage = 0;
+  List<Widget> pages = const [HomePage(), HistoryPage()];
 
   void signUserOut() {
     FirebaseAuth.instance.signOut();
@@ -94,19 +97,18 @@ class _CameraPageState extends State<CameraPage> {
     widget.onImage(inputImage);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         title: const Text("FaceTally"),
-          actions: [
-            IconButton(
-              onPressed: signUserOut,
-              icon: const Icon(Icons.logout),
-            )
-          ],
-        ),
+        actions: [
+          IconButton(
+            onPressed: signUserOut,
+            icon: const Icon(Icons.logout),
+          )
+        ],
+      ),
       backgroundColor: Colors.red[100],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -116,20 +118,7 @@ class _CameraPageState extends State<CameraPage> {
         },
         child: const Icon(Icons.cameraswitch),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Stack(children: [
-            (_cameraController.value.isInitialized)
-                ? CameraPreview(_cameraController)
-                : Container(
-                    color: Colors.pink[100],
-                    child: const Center(child: CircularProgressIndicator())),
-
-            if (widget.customPaint != null) widget.customPaint!,
-
-          ]),
-        ),
-      ),
+      body: _liveBody(),
       bottomNavigationBar: NavigationBar(
         destinations: const [
           NavigationDestination(icon: Icon(Icons.camera), label: 'Camera'),
@@ -141,6 +130,36 @@ class _CameraPageState extends State<CameraPage> {
           });
         },
         selectedIndex: currentPage,
+      ),
+    );
+  }
+
+
+  Widget _liveBody() {
+    if (_cameraController?.value.isInitialized == false) {
+      return Container();
+    }
+    final size = MediaQuery.of(context).size;
+    var scale = size.aspectRatio * _cameraController!.value.aspectRatio;
+    if (scale < 1) scale = 1 / scale;
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Transform.scale(
+            scale: scale,
+            child: Center(
+              child: !_cameraController.value.isInitialized
+                  ? const Center(
+                child: Text("Changing camera lens"),
+              )
+                  : CameraPreview(_cameraController!),
+            ),
+          ),
+          if (widget.customPaint != null) widget.customPaint!,
+
+        ],
       ),
     );
   }
