@@ -1,11 +1,17 @@
 import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'history.dart';
-import 'home_page.dart';
+import 'home.dart';
 
 class CameraPage extends StatefulWidget {
-  const CameraPage({Key? key, required this.cameras}) : super(key: key);
+  final CustomPaint? customPaint;
+  final Function(InputImage inputImage) onImage;
+
+  const CameraPage({Key? key, required this.cameras, required this.onImage,
+    this.customPaint,}) : super(key: key);
 
   final List<CameraDescription>? cameras;
 
@@ -31,10 +37,11 @@ class _CameraPageState extends State<CameraPage> {
 
   Future initCamera(CameraDescription cameraDescription) async {
     _cameraController =
-        CameraController(cameraDescription, ResolutionPreset.high);
+        CameraController(cameraDescription, ResolutionPreset.high, enableAudio: false);
     try {
       await _cameraController.initialize().then((_) {
         if (!mounted) return;
+        _cameraController?.startImageStream(_processCameraImage);
         setState(() {});
       });
     } on CameraException catch (e) {
@@ -50,6 +57,43 @@ class _CameraPageState extends State<CameraPage> {
   void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
+
+  Future _processCameraImage(final CameraImage image) async {
+    final WriteBuffer allBytes = WriteBuffer();
+    for (final Plane plane in image.planes) {
+      allBytes.putUint8List(plane.bytes);
+    }
+    final bytes = allBytes.done().buffer.asUint8List();
+    final Size imageSize = Size(
+      image.width.toDouble(),
+      image.height.toDouble(),
+    );
+    final camera = widget.cameras![_isRearCameraSelected ? 0 : 1];
+    final imageRotation =
+        InputImageRotationValue.fromRawValue(camera.sensorOrientation) ??
+            InputImageRotation.rotation0deg;
+    final inputImageFormat =
+        InputImageFormatValue.fromRawValue(image.format.raw) ??
+            InputImageFormat.nv21;
+    final planeData = image.planes.map((final Plane plane) {
+      return InputImagePlaneMetadata(
+          bytesPerRow: plane.bytesPerRow,
+          height: plane.height,
+          width: plane.width);
+    }).toList();
+    final inputImageData = InputImageData(
+      size: imageSize,
+      imageRotation: imageRotation,
+      inputImageFormat: inputImageFormat,
+      planeData: planeData,
+    );
+    final inputImage = InputImage.fromBytes(
+      bytes: bytes,
+      inputImageData: inputImageData,
+    );
+    widget.onImage(inputImage);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +124,9 @@ class _CameraPageState extends State<CameraPage> {
                 : Container(
                     color: Colors.pink[100],
                     child: const Center(child: CircularProgressIndicator())),
+
+            if (widget.customPaint != null) widget.customPaint!,
+
           ]),
         ),
       ),

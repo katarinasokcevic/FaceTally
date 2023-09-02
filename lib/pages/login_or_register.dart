@@ -1,5 +1,5 @@
-import 'package:facetally/pages/login_page.dart';
-import 'package:facetally/pages/register_page.dart';
+import 'package:facetally/pages/login.dart';
+import 'package:facetally/pages/register.dart';
 import 'package:flutter/material.dart';
 
 class LoginOrRegisterPage extends StatefulWidget {

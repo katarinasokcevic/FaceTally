@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'home.dart';
 
 const int personCount =20;
 

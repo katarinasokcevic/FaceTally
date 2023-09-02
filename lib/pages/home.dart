@@ -2,12 +2,11 @@ import 'package:camera/camera.dart';
 import 'package:facetally/pages/history.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'camera_page.dart';
+import 'camera.dart';
+import 'face_dectetor.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
-
-
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -42,7 +41,7 @@ class _HomePageState extends State<HomePage> {
             child: ElevatedButton(
           onPressed: () async {
             await availableCameras().then((value) => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => CameraPage(cameras: value))));
+                MaterialPageRoute(builder: (_) => FaceDetectorPage())));
           },
           child: const Text("Open the camera"),
         )),
