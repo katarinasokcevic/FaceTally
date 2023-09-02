@@ -9,12 +9,14 @@ import 'home.dart';
 class CameraPage extends StatefulWidget {
   final CustomPaint? customPaint;
   final Function(InputImage inputImage) onImage;
+  final int faceCount;
 
   const CameraPage({
     Key? key,
     required this.cameras,
     required this.onImage,
     this.customPaint,
+    required this.faceCount,
   }) : super(key: key);
 
   final List<CameraDescription>? cameras;
@@ -55,7 +57,7 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   int currentPage = 0;
-  List<Widget> pages = const [HomePage(), HistoryPage()];
+  List<Widget> pages =  [HomePage(), HistoryPage()];
 
   void signUserOut() {
     FirebaseAuth.instance.signOut();
@@ -109,7 +111,7 @@ class _CameraPageState extends State<CameraPage> {
           )
         ],
       ),
-      backgroundColor: Colors.red[100],
+      backgroundColor: Colors.grey[300],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('Floating Action Button');
@@ -118,22 +120,46 @@ class _CameraPageState extends State<CameraPage> {
         },
         child: const Icon(Icons.cameraswitch),
       ),
-      body: _liveBody(),
-      bottomNavigationBar: NavigationBar(
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.camera), label: 'Camera'),
-          NavigationDestination(icon: Icon(Icons.history), label: 'History'),
+      body: Stack(
+        children: [
+          _liveBody(),
+          Text(
+            'Faces detected: ${widget.faceCount}',
+            style: const TextStyle(
+              fontSize: 28, // Adjust the font size as needed
+              color: Colors.black, // Set the text color to white
+              fontWeight: FontWeight.bold, // Optionally, set the font weight
+            ),
+          ),
         ],
-        onDestinationSelected: (int index) {
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.camera),
+            label: 'Camera',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
+          ),
+        ],
+        currentIndex: currentPage,
+        onTap: (index) {
           setState(() {
             currentPage = index;
+            if (index == 1) {
+              // Navigate to History Page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HistoryPage()),
+              );
+            }
           });
         },
-        selectedIndex: currentPage,
       ),
     );
   }
-
 
   Widget _liveBody() {
     if (_cameraController?.value.isInitialized == false) {
@@ -143,7 +169,7 @@ class _CameraPageState extends State<CameraPage> {
     var scale = size.aspectRatio * _cameraController!.value.aspectRatio;
     if (scale < 1) scale = 1 / scale;
     return Container(
-      color: Colors.black,
+      color: Colors.grey[300],
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -152,13 +178,12 @@ class _CameraPageState extends State<CameraPage> {
             child: Center(
               child: !_cameraController.value.isInitialized
                   ? const Center(
-                child: Text("Changing camera lens"),
-              )
+                      child: Text("Changing camera lens"),
+                    )
                   : CameraPreview(_cameraController!),
             ),
           ),
           if (widget.customPaint != null) widget.customPaint!,
-
         ],
       ),
     );

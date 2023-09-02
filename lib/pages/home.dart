@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentPage = 0;
-  List<Widget> pages = const [HomePage(), HistoryPage()];
+  List<Widget> pages =  [HomePage(), HistoryPage()];
 
   final user = FirebaseAuth.instance.currentUser!;
 
@@ -26,8 +26,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red[100],
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text("FaceTally"),
         actions: [
           IconButton(
@@ -38,25 +39,57 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
         child: Center(
-            child: ElevatedButton(
-          onPressed: () async {
-            await availableCameras().then((cameras) => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => FaceDetectorPage(cameras: cameras))));
-          },
-          child: const Text("Open the camera"),
-        )),
+          child: GestureDetector(
+            onTap: () async {
+              await availableCameras().then((cameras) =>
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => FaceDetectorPage(cameras: cameras),
+                  )));
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(
+                  horizontal: 100, vertical: 250),
+              decoration: BoxDecoration(
+                color: Colors.pink,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Center(
+                child: Text(
+                  "Open the camera",
+                  style: TextStyle(
+                    fontSize: 18, // Text style
+                    color: Colors.white, // Text color
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
-      bottomNavigationBar: NavigationBar(
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.camera), label: 'Camera'),
-          NavigationDestination(icon: Icon(Icons.history), label: 'History'),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.camera),
+            label: 'Camera',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
+          ),
         ],
-        onDestinationSelected: (int index) {
+        currentIndex: currentPage,
+        onTap: (index) {
           setState(() {
             currentPage = index;
+            if (index == 1) {
+              // Navigate to History Page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HistoryPage()),
+              );
+            }
           });
         },
-        selectedIndex: currentPage,
       ),
     );
   }
