@@ -62,7 +62,6 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
     _isBusy = true;
     setState(() {});
     final faces = await _faceDetector.processImage(inputImage);
-    print("FOOO");
     if (inputImage.inputImageData?.size != null &&
         inputImage.inputImageData?.imageRotation != null) {
       final painter = FaceDetectorPainter(
@@ -72,7 +71,7 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
       _customPaint = CustomPaint(painter: painter);
 
       _faceCount = faces.length;
-      print("sokcevic: # of faces: ${faces.length}");
+      print("# of faces: ${faces.length}");
 
       // Get the image data from the InputImage object
       imglib.Image? originalImage = convertImageToJpg(image);
@@ -81,7 +80,7 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
         height: image.height,
         bytes: image.planes[0].bytes.buffer,
       );*/
-      print("sokcevic: image is $originalImage");
+      print("image is $originalImage");
 
       if (originalImage != null) {
         // Decode the image data to create an Image object
@@ -91,16 +90,19 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
             continue;
           }
           if (savedFaces.contains(face.trackingId)) {
-            print("sokcevic: face already tracked, ${face.trackingId}");
+            print("face already tracked, ${face.trackingId}");
             continue;
           }
           savedFaces.add(face.trackingId!);
 
           // Crop the image using the bounding box
+          if (inputImage.inputImageData!.imageRotation.rawValue > 0) {
+            originalImage = imglib.copyRotate(originalImage!, angle: inputImage.inputImageData!.imageRotation.rawValue);
+          }
           final croppedImage = imglib.copyCrop(
-            originalImage,
-            x: boundingBox.topRight.dx.toInt(),
-            y: boundingBox.topRight.dy.toInt(),
+            originalImage!,
+            x: boundingBox.topLeft.dx.toInt(),
+            y: boundingBox.topLeft.dy.toInt(),
             width: boundingBox.width.toInt(),
             height: boundingBox.height.toInt(),
           );
@@ -110,7 +112,7 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
           final storageReference =
               FirebaseStorage.instance.ref().child('cropped_face_$ts.jpg');
 
-          print("sokcevic: uploading face to $ts");
+          print("uploading face to $ts");
 
           // Upload the cropped image file to Firebase Storage
           await storageReference.putData(jpg.encode(croppedImage));
