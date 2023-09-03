@@ -2,13 +2,14 @@ import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'history.dart';
 import 'home.dart';
 
 class CameraPage extends StatefulWidget {
   final CustomPaint? customPaint;
-  final Function(InputImage inputImage) onImage;
+  final Function(InputImage inputImage, CameraImage image) onImage;
   final int faceCount;
 
   const CameraPage({
@@ -96,7 +97,7 @@ class _CameraPageState extends State<CameraPage> {
       bytes: bytes,
       inputImageData: inputImageData,
     );
-    widget.onImage(inputImage);
+    widget.onImage(inputImage, image);
   }
 
   @override
