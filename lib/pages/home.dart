@@ -2,7 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:facetally/pages/history.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'camera.dart';
 import 'face_detector.dart';
 
 class HomePage extends StatefulWidget {

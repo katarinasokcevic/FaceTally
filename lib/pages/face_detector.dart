@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
@@ -75,11 +73,6 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
 
       // Get the image data from the InputImage object
       imglib.Image? originalImage = convertImageToJpg(image);
-      /*imglib.Image.fromBytes(
-        width: (image.planes[0].bytesPerRow / 4).round(),
-        height: image.height,
-        bytes: image.planes[0].bytes.buffer,
-      );*/
       print("image is $originalImage");
 
       if (originalImage != null) {
@@ -110,7 +103,7 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
           // Create a reference to a location in Firebase Storage
           final ts = DateTime.now().millisecondsSinceEpoch;
           final storageReference =
-              FirebaseStorage.instance.ref().child('cropped_face_$ts.jpg');
+              FirebaseStorage.instance.ref().child('cropped_face/cropped_face_$ts.jpg');
 
           print("uploading face to $ts");
 

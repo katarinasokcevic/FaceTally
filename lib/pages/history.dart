@@ -1,8 +1,8 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-const int personCount=10;
+import 'info.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -14,7 +14,23 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   int currentPage = 1;
 
-  List<Widget> pages =  [HomePage(), HistoryPage()];
+  List<Widget> pages = [HomePage(), HistoryPage()];
+  List<String> imageUrls = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadImageUrls();
+  }
+
+  Future<void> loadImageUrls() async {
+    final storageReference =
+        FirebaseStorage.instance.ref().child('cropped_face/');
+    final listResult = await storageReference.listAll();
+    imageUrls = await Future.wait(
+        listResult.items.map((item) => item.getDownloadURL()));
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +38,57 @@ class _HistoryPageState extends State<HistoryPage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text('History Page'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () async {
+              final storageReference =
+                  FirebaseStorage.instance.ref().child('cropped_face/');
+              final listResult = await storageReference.listAll();
+              for (var item in listResult.items) {
+                await item.delete();
+              }
+              setState(() {
+                imageUrls.clear();
+              });
+            },
+          ),
+        ],
       ),
       body: ListView.builder(
-        itemCount: personCount,
+        itemCount: imageUrls.length,
         itemBuilder: (BuildContext context, int index) {
-          final currentTime = DateTime.now();
-          final formattedTime = '${currentTime.hour}:${currentTime.minute}:${currentTime.second}';
+          final fileName = imageUrls[index].split('/').last;
+          final ts = int.parse(fileName.split('_').last.split('.').first);
+          final seenAt = DateTime.fromMillisecondsSinceEpoch(ts);
+          final formattedTime =
+              '${seenAt.hour}:${seenAt.minute}:${seenAt.second}';
           return ListTile(
-            title: Text('Face ${(index + 1)}'),
-            subtitle: Text('Time: $formattedTime'),
-            leading: const Icon(Icons.person),
+            title: Text(
+              'Face ${(index + 1)}',
+              style: TextStyle(fontSize: 18),
+            ),
+            subtitle: Text(
+              'Time seen: $formattedTime',
+              style: TextStyle(fontSize: 16),
+            ),
+            leading: Hero(
+              tag: 'image$index',
+              child: Image.network(imageUrls[index]),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => InfoPage(
+                    imageUrl: imageUrls[index],
+                    heroTag: 'image$index',
+                    faceIndex: index + 1,
+                    timeSeen: formattedTime,
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
@@ -52,10 +109,7 @@ class _HistoryPageState extends State<HistoryPage> {
             currentPage = index;
             if (index == 0) {
               // Navigate to Camera Page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
+              Navigator.pop(context);
             }
           });
         },

@@ -58,7 +58,7 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   int currentPage = 0;
-  List<Widget> pages =  [HomePage(), HistoryPage()];
+  List<Widget> pages = [HomePage(), HistoryPage()];
 
   void signUserOut() {
     FirebaseAuth.instance.signOut();
@@ -104,11 +104,11 @@ class _CameraPageState extends State<CameraPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("FaceTally"),
+        title: Text("FaceTally"),
         actions: [
           IconButton(
             onPressed: signUserOut,
-            icon: const Icon(Icons.logout),
+            icon: Icon(Icons.logout),
           )
         ],
       ),
@@ -119,7 +119,7 @@ class _CameraPageState extends State<CameraPage> {
           setState(() => _isRearCameraSelected = !_isRearCameraSelected);
           initCamera(widget.cameras![_isRearCameraSelected ? 0 : 1]);
         },
-        child: const Icon(Icons.cameraswitch),
+        child: Icon(Icons.cameraswitch),
       ),
       body: Stack(
         children: [
@@ -150,6 +150,10 @@ class _CameraPageState extends State<CameraPage> {
           setState(() {
             currentPage = index;
             if (index == 1) {
+              // Stop the camera image stream
+              _cameraController.stopImageStream();
+              // Dispose of the camera controller
+              _cameraController.dispose();
               // Navigate to History Page
               Navigator.push(
                 context,
