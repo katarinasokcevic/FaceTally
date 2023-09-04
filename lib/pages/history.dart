@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -24,8 +25,10 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> loadImageUrls() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    String uid = user!.uid;
     final storageReference =
-        FirebaseStorage.instance.ref().child('cropped_face/');
+        FirebaseStorage.instance.ref().child('$uid/');
     final listResult = await storageReference.listAll();
     imageUrls = await Future.wait(
         listResult.items.map((item) => item.getDownloadURL()));
@@ -42,8 +45,10 @@ class _HistoryPageState extends State<HistoryPage> {
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () async {
+              User? user = FirebaseAuth.instance.currentUser;
+              String uid = user!.uid;
               final storageReference =
-                  FirebaseStorage.instance.ref().child('cropped_face/');
+                  FirebaseStorage.instance.ref().child('$uid/');
               final listResult = await storageReference.listAll();
               for (var item in listResult.items) {
                 await item.delete();

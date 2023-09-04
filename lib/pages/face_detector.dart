@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as imglib;
@@ -90,7 +91,8 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
 
           // Crop the image using the bounding box
           if (inputImage.inputImageData!.imageRotation.rawValue > 0) {
-            originalImage = imglib.copyRotate(originalImage!, angle: inputImage.inputImageData!.imageRotation.rawValue);
+            originalImage = imglib.copyRotate(originalImage!,
+                angle: inputImage.inputImageData!.imageRotation.rawValue);
           }
           final croppedImage = imglib.copyCrop(
             originalImage!,
@@ -102,8 +104,13 @@ class _FaceDetectorPageState extends State<FaceDetectorPage> {
 
           // Create a reference to a location in Firebase Storage
           final ts = DateTime.now().millisecondsSinceEpoch;
-          final storageReference =
-              FirebaseStorage.instance.ref().child('cropped_face/cropped_face_$ts.jpg');
+
+          User? user = FirebaseAuth.instance.currentUser;
+
+          String uid = user!.uid;
+          final storageReference = FirebaseStorage.instance
+              .ref()
+              .child('$uid/cropped_face_$ts.jpg');
 
           print("uploading face to $ts");
 

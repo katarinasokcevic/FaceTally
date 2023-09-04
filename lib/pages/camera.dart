@@ -148,14 +148,9 @@ class _CameraPageState extends State<CameraPage> {
         currentIndex: currentPage,
         onTap: (index) {
           setState(() {
-            currentPage = index;
+            // Navigate to History Page
             if (index == 1) {
-              // Stop the camera image stream
-              _cameraController.stopImageStream();
-              // Dispose of the camera controller
-              _cameraController.dispose();
-              // Navigate to History Page
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => HistoryPage()),
               );
